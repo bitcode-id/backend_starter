@@ -78,7 +78,7 @@ Route::group(['prefix' => '/admin/kategori', 'middleware' => ['auth:sanctum', 'c
     Route::get('/', [KategoriController::class, 'index'])->name('admin_kategori');
     Route::get('/show/{slug}', [KategoriController::class, 'show'])->name('admin_kategori_show');
     Route::post('/store', [KategoriController::class, 'store'])->name('admin_kategori_store');
-    Route::post('/destroy', [KategoriController::class, 'destroy'])->name('admin_kategori_destroy');
+    Route::post('/destroy/{id}', [KategoriController::class, 'destroy'])->name('admin_kategori_destroy');
 });
 
 // route landing web utama
