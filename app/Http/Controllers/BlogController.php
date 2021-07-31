@@ -12,6 +12,11 @@ use App\Models\Blog;
 
 class BlogController extends Controller
 {
+    public function status ($data, $ok = 200, $err = 404)
+    {
+        return $status = $data ? $ok : $err;
+    }
+
     // list blog untuk admin dan publik
     public function index ()
     {
@@ -36,7 +41,7 @@ class BlogController extends Controller
 
     	return response()->json([
     		'data' => $data
-    	]);
+    	], $this->status($data, 200, 404));
     }
 
     // tampilkan blog
@@ -44,11 +49,9 @@ class BlogController extends Controller
     {
     	$data = Blog::with('user', 'kategori')->where('slug', $slug)->first();
 
-    	$code = $data ? 200 : 404;
-
         return response()->json([
     		'data' => $data
-    	], $code);	
+    	], $this->status($data, 200, 404));	
     }
 
     // arsip blog berdasarkan kategori
@@ -66,7 +69,7 @@ class BlogController extends Controller
 
     	return response()->json([
     		'data' => $data
-    	]);
+    	], $this->status($data, 200, 404));
     }
 
     // buat atau update blog
@@ -113,7 +116,7 @@ class BlogController extends Controller
         if ($blog) {
         	return response()->json([
         		'info' => 'Konten '.$request->judul.' telah '.$request->status
-        	], 200);
+        	]);
         }
     }
 
@@ -150,7 +153,7 @@ class BlogController extends Controller
                 return response()->json($url, 200);
             }
         } else {
-            return response()->json('Jenis file tidak diizinkan.', 302);
+            return response()->json('Jenis file tidak diizinkan.', 422);
         }
     }
 
@@ -161,7 +164,7 @@ class BlogController extends Controller
         if ($data->delete()) {
             return response()->json([
             	'info' => 'Data telah dihapus'
-            ]);
+            ], $this->status($data, 200, 422));
         }
     }
 }
