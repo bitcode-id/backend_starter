@@ -29,6 +29,14 @@ Route::get('/home', function () {
     return view('home');
 });
 
+Route::get('/token', function (Request $request) {
+    $token = $request->session()->token();
+
+    $token = csrf_token();
+
+    return $token;
+});
+
 // route autentikasi
 Route::group(['prefix' => '/auth'], function () {
     Route::post('/login', [UserController::class, 'login'])->name('user_login');
