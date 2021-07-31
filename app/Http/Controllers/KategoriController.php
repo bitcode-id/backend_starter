@@ -12,6 +12,11 @@ use App\Models\Kategori;
 
 class KategoriController extends Controller
 {
+    public function status ($data, $ok = 200, $err = 404)
+    {
+        return $status = $data ? $ok : $err;
+    }
+
     // list kategori untuk admin dan publik
     public function index ()
     {
@@ -22,7 +27,7 @@ class KategoriController extends Controller
 
     	return response()->json([
     		'data' => $data
-    	]);
+    	], $this->status($data, 200, 404));
     }
 
     // tampilkan kategori
@@ -32,7 +37,7 @@ class KategoriController extends Controller
 
     	return response()->json([
     		'data' => $data
-    	]);	
+    	], $this->status($data, 200, 404));	
     }
 
     // buat atau update kategori
@@ -69,7 +74,7 @@ class KategoriController extends Controller
         if ($data->delete()) {
             return response()->json([
             	'info' => 'Data telah dihapus'
-            ]);
+            ], $this->status($data, 200, 422));
         }
     }
 }
