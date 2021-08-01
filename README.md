@@ -13,19 +13,24 @@ Starter aplikasi ini adalah kerangka dasar untuk memulai project, sudah terdapat
 
 ## Konsep aplikasi 
 
-Single Page Application (SPA) yang mendukung SEO (NuxtJS SSR) dan Progressive Web Application (memungkinkan aplikasi dinstal pada smartphone)
+Single Page Application (SPA) yang mendukung SEO (NuxtJS SSR) dan Progressive Web Application (memungkinkan aplikasi diinstal pada smartphone)
 
 ## Fitur
 
 - Autentikasi dengan Laravel Sanctum, support session dan token, sangat ideal untuk aplikasi SPA [menurut dokumentasinya](https://laravel.com/docs/8.x/sanctum)
-- Multiple Role (Superadmin, admin, user, dst)
+- Multiple Role (Superadmin, admin, user, dst), standar untuk setiap project Bitcode.id
 - Middleware Superadmin dan admin, standar untuk setiap project Bitcode.id
 - Create dan Update dalam satu method (updateOrCreate)
 - Sample CRUD Blog dan Kategori sudah support SEO dengan menyertakan field meta deksripsi dan tag
+- Sample pengaturan untuk membuat pengaturan aplikasi
 - Semua Route di routes/web.php, api hanya jika dibutuhkan untuk pengembanga mobile
 - Route digroup berdasarkan Controller untuk mudah dikenali
 - Support field provinsi, kota, kecamatan untuk tiap user
 - File manager dengan Unisharp Laravel Filemanager
+
+## Eloquent dan query builder
+
+Disaat saya butuh performa lebih cepat saya menggunakan query builder, contoh di LandingController sebagai konten halaman utama agar user segera mendapatkan kontennya.
 
 ## Instalasi
 
