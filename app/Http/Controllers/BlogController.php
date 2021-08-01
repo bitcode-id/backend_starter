@@ -14,13 +14,7 @@ class BlogController extends Controller
 {
     public function status ($data, $ok = 200, $err = 404)
     {
-        // $status = $data ? $ok : $err;
-        if ($data == null || count($data) == 0) {
-            return $err;
-        } else {
-            return $ok;
-        }
-        
+        return !empty(is_array($data) ? count($data) : $data) ? $ok : $err;
     }
 
     // list blog untuk admin dan publik

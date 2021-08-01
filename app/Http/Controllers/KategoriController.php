@@ -14,16 +14,13 @@ class KategoriController extends Controller
 {
     public function status ($data, $ok = 200, $err = 404)
     {
-        return $status = $data ? $ok : $err;
+        return !empty(is_array($data) ? count($data) : $data) ? $ok : $err;
     }
 
     // list kategori untuk admin dan publik
     public function index ()
     {
-    	$data = DB::table('kategori')
-                ->orderBy('nama', 'asc')
-                ->select('id', 'nama', 'slug', 'updated_at')
-                ->limit(5000)->get();
+    	$data = Kategori::orderBy('nama', 'asc')->select('id', 'nama', 'slug', 'updated_at')->limit(5000)->get();
 
     	return response()->json([
     		'data' => $data
