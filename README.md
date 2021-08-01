@@ -14,6 +14,7 @@ Starter aplikasi ini adalah kerangka dasar untuk memulai project, sudah terdapat
 ## Konsep aplikasi 
 
 Single Page Application (SPA) yang mendukung SEO (NuxtJS SSR) dan Progressive Web Application (memungkinkan aplikasi diinstal pada smartphone)
+- contoh [http://v2-backend.fbk.id](http://v2.backend.fbk.id) dan [http://v2.fbk.id](http://v2.fbk.id)
 
 ## Fitur
 
