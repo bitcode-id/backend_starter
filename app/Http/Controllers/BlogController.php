@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\DB;
 use File;
 use Validator;
+use Exception;
 use App\Models\Blog;
 
 class BlogController extends Controller
@@ -74,87 +75,88 @@ class BlogController extends Controller
 
     // buat atau update blog
     public function store (Request $request)
-    {
-    	$this->validate($request, [
-    		'tanggal' => 'required',
-            'judul' => 'required|string|max:250',
-            'meta' => 'required|string|max:250',
-            'kategori_id' => 'required',
-            'konten' => 'required|string',
-            'status' => 'required'
-        ], [
-            'tanggal.required' => 'Tanggal harus diisi',
-            'judul.required' => 'Judul harus diisi',
-            'judul.max' => 'Judul maksimal 250 karakter',
-            'meta.required' => 'Meta harus diisi',
-            'meta.max' => 'Meta maksimal 250 karakter',
-            'kategori_id.required' => 'kategori harus dipilih',
-            'konten.required' => 'Konten harus diisi',
-            'status.required' => 'Status harus dipilih'
-        ]);
+    {   
+        DB::beginTransaction();
+        try {
+            $this->validate($request, [
+                'tanggal' => 'required',
+                'judul' => 'required|string|max:250',
+                'meta' => 'required|string|max:250',
+                'kategori_id' => 'required',
+                'konten' => 'required|string',
+                'status' => 'required'
+            ], [
+                'tanggal.required' => 'Tanggal harus diisi',
+                'judul.required' => 'Judul harus diisi',
+                'judul.max' => 'Judul maksimal 250 karakter',
+                'meta.required' => 'Meta harus diisi',
+                'meta.max' => 'Meta maksimal 250 karakter',
+                'kategori_id.required' => 'kategori harus dipilih',
+                'konten.required' => 'Konten harus diisi',
+                'status.required' => 'Status harus dipilih'
+            ]);
 
-        $slug = $request->slug ?? Str::slug($request->judul, '-');
-        $user_id = $request->user_id ? $request->user_id : auth()->user()->id;
+            $slug = $request->slug ?? Str::slug($request->judul, '-');
+            $user_id = $request->user_id ? $request->user_id : auth()->user()->id;
 
-        $blog = Blog::updateOrCreate(
-          [
-            'id' => $request->id
-          ],
-          [
-            'user_id' => $user_id,
-            'tanggal' => $request->tanggal,
-            'judul' => $request->judul,
-            'slug' => $slug,
-            'meta' => $request->meta,
-            'tag' => $request->tag,
-            'kategori_id' => $request->kategori_id,
-            'featured' => $request->featured,
-            'konten' => $request->konten,
-            'status' => $request->status
-          ]);
+            $blog = Blog::updateOrCreate(
+              [
+                'id' => $request->id
+              ],
+              [
+                'user_id' => $user_id,
+                'tanggal' => $request->tanggal,
+                'judul' => $request->judul,
+                'slug' => $slug,
+                'meta' => $request->meta,
+                'tag' => $request->tag,
+                'kategori_id' => $request->kategori_id,
+                'featured' => $request->featured,
+                'konten' => $request->konten,
+                'status' => $request->status
+              ]);
 
-        if ($blog) {
-        	return response()->json([
-        		'info' => 'Konten '.$request->judul.' telah '.$request->status
-        	]);
+            DB::commit();
+            return response()->json([
+                'info' => 'Konten '.$request->judul.' telah '.$request->status
+            ]);
+
+        } catch (Exception $e) {
+            DB::rollback();
+            return response()->json('Gagal membuat blog', 422);
         }
+    	
     }
 
     // upload file, simpan ke sub direktori laravel file manager
     public function upload(Request $request)
     {
-        $file = '';
-        if ($request->upload) {
-            $file = $request->upload;
-        } else {
-            $file = $request->file;
-        }
-    
+        $blacklist = ['php', 'sh', 'bin', 'exe'];
+        $file = $request->upload ? $request->upload : $request->file;
         $file_ori_name = $file->getClientOriginalName();
         $file_path = realpath($file);
         $file_name = explode('.',$file_ori_name)[0];
         $file_extension = $file->getClientOriginalExtension();
         $file_slug = Str::slug($file_name, '_').".".$file_extension;
 
-        if ($file_extension != 'php' || 'sh' || 'bin' || 'exe') {
-            $name = auth()->user()->name;
-            $name_slug = Str::slug($name, '_');
-            $role = auth()->user()->role;
-            $path = '';
-            
-            if ($role == "superadmin") {
-              $path =  'storage/files/superadmin';
-            } else {
-              $path =  'storage/files/superadmin/'.$name_slug;
-            }
+        $name = auth()->user()->name;
+        $name_slug = Str::slug($name, '_');
+        $role = auth()->user()->role;
+        $path = '';
+        $role == "superadmin" ? $path =  'storage/files/superadmin' : $path =  'storage/files/superadmin/'.$name_slug;
 
-            if ($file->move($path, $file_slug)) {
+        try {
+            if (!in_array($file_extension, $blacklist)) {
+                $file->move($path, $file_slug);
                 $url = $path.'/'.$file_slug;
                 return response()->json($url, 200);
+            } else {
+                throw new Exception('Jenis file tidak diizinkan', 1);
             }
-        } else {
-            return response()->json('Jenis file tidak diizinkan.', 422);
+        } catch (Exception $e) {
+            return response()->json($e->getMessage(), 422);
         }
+
     }
 
     // hapus data, softdeletes
@@ -163,7 +165,7 @@ class BlogController extends Controller
         $data = Blog::find($id);
         if ($data->delete()) {
             return response()->json([
-            	'info' => 'Data telah dihapus'
+                'info' => 'Data telah dihapus'
             ], $this->status($data, 200, 422));
         }
     }
