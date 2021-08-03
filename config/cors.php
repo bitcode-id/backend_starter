@@ -31,7 +31,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost', 'http://starter.local', 'http://starter.bitcode.id'],
+    'allowed_origins' => ['http://localhost', 'http://starter.local', 'http://starter.bitcode.id', 'http://localhost:8000'],
 
     'allowed_origins_patterns' => [],
 
