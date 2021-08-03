@@ -48,19 +48,22 @@ class KategoriController extends Controller
 
         $slug = $request->slug ?? Str::slug($request->nama, '-');
         
-        $kategori = Kategori::updateOrCreate(
-          [
-            'id' => $request->id
-          ],
-          [
-            'nama' => $request->nama,
-            'slug' => $slug
-          ]);
+        try {
+            $kategori = Kategori::updateOrCreate(
+                [
+                'id' => $request->id
+                ],
+                [
+                'nama' => $request->nama,
+                'slug' => $slug
+                ]);
 
-        if ($kategori) {
-        	return response()->json([
-        		'info' => 'Kategori '.$request->nama.' telah dibuat'
-        	]);
+            return response()->json([
+                'info' => 'Kategori '.$request->nama.' telah dibuat'
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json('Kategori gagal disimpan', 422);
         }
     }
 
